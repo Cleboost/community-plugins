@@ -102,6 +102,10 @@ function checkRemoteHash(delay: number?)
     setState("isRemoteCheckRunning", true)
     setState("lastRemoteCheckRunTime", os.time())
 
+    if cfg("show_checking_notification") then
+        noctalia.notify(tr("notification.checking_update"))
+    end
+
     noctalia.writeFile(remoteHashFile, "")
     noctalia.runAsync(`sleep {delay} && {remoteHashCmd} > {remoteHashFile} & echo $! > {remotePidFile}`)
 end
