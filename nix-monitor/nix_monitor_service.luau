@@ -65,6 +65,7 @@ noctalia.writeFile(remoteHashFile, "")
 
 -- Local check
 function checkLocalHash()
+    setState("lastLocalCheckTime", os.time())
     noctalia.runAsync(localHashCmd, function(res)
         if res.exitCode == 0 then
             setState("localHash", res.stdout)
