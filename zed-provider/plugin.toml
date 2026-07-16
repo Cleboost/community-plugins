@@ -1,7 +1,7 @@
 id = "cleboost/zed-provider"
 name = "Zed Provider"
 version = "1.0.0"
-min_noctalia = "5.0.0"
+plugin_api = 3
 author = "cleboost"
 license = "MIT"
 icon = "folder-open"
