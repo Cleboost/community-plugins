@@ -162,3 +162,14 @@ icon = "plug"
 description = "Inspect and kill listening TCP/UDP ports."
 min_noctalia = "5.0.0"
 tags = ["network", "utility", "development", "indicator", "bar", "panel", "service"]
+
+[[plugin]]
+id = "lux/ideapad-conservation-mode"
+name = "IdeaPad Conservation Mode"
+version = "0.3.0"
+author = "lux"
+license = "MIT"
+icon = "laptop"
+description = "Toggles battery conservation mode via the ideapad_acpi driver, on Lenovo IdeaPad and Legion laptops."
+min_noctalia = "5.0.0"
+tags = ["hardware", "shortcut", "system"]
