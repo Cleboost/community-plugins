@@ -51,39 +51,32 @@ local function loadProjects(onDone)
 	end)
 end
 
-local function filterProjects(projects, query)
-	if query == "" then
-		return projects
-	end
-
-	local lower = query:lower()
-	local results = {}
-	for _, path in projects do
-		if path:lower():find(lower, 1, true) then
-			table.insert(results, path)
-		end
-	end
-	return results
-end
-
-local function makeRows(projects)
+local function makeRows(projects, filter)
 	local home = noctalia.getenv("HOME") or ""
 	local rows = {}
 	for _, path in projects do
-		local display = (home ~= "" and path:sub(1, #home) == home) and "~" .. path:sub(#home + 1) or path
-		table.insert(rows, {
-			id = path,
-			title = projectName(path),
-			subtitle = display,
-			icon = "zed",
-		})
+		local name = projectName(path)
+		local score = filter == "" and 0 or noctalia.fuzzyScore(filter, name)
+		if score == nil then
+			score = noctalia.fuzzyScore(filter, path)
+		end
+		if filter == "" or score ~= nil then
+			local display = (home ~= "" and path:sub(1, #home) == home) and "~" .. path:sub(#home + 1) or path
+			table.insert(rows, {
+				id = path,
+				title = name,
+				subtitle = display,
+				icon = "zed",
+				score = filter == "" and nil or score,
+			})
+		end
 	end
 	return rows
 end
 
 local function showResults(query, projects, filter)
-	local filtered = filterProjects(projects, filter)
-	if #filtered == 0 then
+	local rows = makeRows(projects, filter)
+	if #rows == 0 then
 		launcher.setResults(query, {
 			{
 				id = "",
@@ -93,12 +86,16 @@ local function showResults(query, projects, filter)
 			},
 		})
 	else
-		launcher.setResults(query, makeRows(filtered))
+		launcher.setResults(query, rows)
 	end
 end
 
 function onQuery(query)
 	local filter = trim(query)
+
+	if filter == "" then
+		cachedProjects = nil
+	end
 
 	if cachedProjects then
 		showResults(query, cachedProjects, filter)

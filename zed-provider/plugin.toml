@@ -1,6 +1,6 @@
 id = "cleboost/zed-provider"
 name = "Zed Provider"
-version = "1.0.0"
+version = "1.0.1"
 min_noctalia = "5.0.0"
 author = "cleboost"
 license = "MIT"
