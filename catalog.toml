@@ -140,3 +140,14 @@ icon = "brand-docker"
 description = "Manage Docker containers, images, volumes, and networks from Noctalia."
 min_noctalia = "5.0.0"
 tags = ["bar", "panel", "service", "development", "system", "utility"]
+
+[[plugin]]
+id = "thatonecalculator/um5606_fan_state"
+name = "ASUS UM5606 Fan State"
+version = "1.0.6"
+author = "ThatOneCalculator"
+license = "MIT"
+icon = "car-fan"
+description = "Set the fan state on the ZenBook S 16 UM5606."
+min_noctalia = "5.0.0"
+tags = ["hardware"]
