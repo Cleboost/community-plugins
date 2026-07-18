@@ -113,7 +113,11 @@ end
 
 function onActivate(id)
     noctalia.runAsync("xdg-open " .. shellEscape(id))
+
     if noctalia.getConfig("notify") then
-        noctalia.notify("Websites", "Opening " .. id)
+        noctalia.notify(
+            noctalia.tr("notify.title"),
+            noctalia.tr("notify.message") .. " " .. id
+        )
     end
 end

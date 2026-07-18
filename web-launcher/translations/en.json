@@ -15,5 +15,9 @@
             "duckduckgo": "DuckDuckGo",
             "direct": "Site's own favicon.ico"
         }
+    },
+    "notify": {
+        "title": "Websites",
+        "message": "Opening"
     }
 }
