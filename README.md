@@ -126,6 +126,15 @@ error messages show the exact missing value, while maintainers review the useful
 Write `translations/en.json` only. Every `label_key` and `description_key` in your manifest must resolve to a key in
 it, and CI checks this. Do not add machine-translated locales; other languages are handled separately.
 
+To test the latest translated locales from [Noctalia Translate](https://i18n.noctalia.dev) in a working checkout, run:
+
+```sh
+./.tools/i18n-pull.sh
+```
+
+The command asks for confirmation and overwrites the locale files returned by the translation service. It does not
+delete local locale files that are absent from the export. Review the resulting diff before committing anything.
+
 ### Tags
 
 The `tags` in `plugin.toml` are used for catalog search. Tags must be lowercase and selected from this list:

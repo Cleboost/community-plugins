@@ -1,54 +1,54 @@
 {
-  "title": "Portctl",
+  "categories": {
+    "cloud": "Cloud",
+    "containers": "Containers",
+    "databases": "Databases",
+    "development": "Development",
+    "other": "Other",
+    "servers": "Servers"
+  },
   "panel": {
-    "search_placeholder": "Search port, process, PID…",
-    "tcp": "TCP",
-    "udp": "UDP",
-    "no_ports": "No listening ports",
-    "no_results": "No results for \"{query}\"",
-    "killing": "Killing {name}…",
-    "kill_confirm": "Kill {name}?",
     "cancel": "Cancel",
     "kill": "Kill",
-    "pid_copied": "Copied PID {pid}"
-  },
-  "categories": {
-    "Development": "Development",
-    "Databases": "Databases",
-    "Containers": "Containers",
-    "Servers": "Servers",
-    "Cloud": "Cloud",
-    "Other": "Other"
+    "kill_confirm": "Kill {name}?",
+    "killing": "Killing {name}…",
+    "no_ports": "No listening ports",
+    "no_results": "No results for \"{query}\"",
+    "pid_copied": "Copied PID {pid}",
+    "search_placeholder": "Search port, process, PID…",
+    "tcp": "TCP",
+    "udp": "UDP"
   },
   "service": {
-    "terminated": "Process {pid} terminated",
     "kill_failed": "Failed to kill PID {pid}",
-    "ss_not_found": "ss (iproute2) not found — install the iproute2 package"
+    "ss_not_found": "ss (iproute2) not found — install the iproute2 package",
+    "terminated": "Process {pid} terminated"
   },
   "settings": {
-    "refresh_interval": {
-      "label": "Refresh interval",
-      "description": "Seconds between port scans"
-    },
-    "ignore_list": {
-      "label": "Ignore processes",
-      "description": "Comma-separated process name substrings to hide (e.g. discord,chrome,steam)"
-    },
-    "ignore_ports": {
-      "label": "Ignore ports",
-      "description": "Comma-separated port numbers to hide (e.g. 37700,6463)"
+    "glyph": {
+      "description": "Icon shown in the bar.",
+      "label": "Glyph"
     },
     "hide_system_ports": {
-      "label": "Hide system ports",
-      "description": "Hide ports below 1024 (privileged/root ports)"
+      "description": "Hide ports below 1024 (privileged/root ports)",
+      "label": "Hide system ports"
     },
     "hide_unknown_ports": {
-      "label": "Hide unknown ports",
-      "description": "Hide ports whose process info is not accessible (e.g. rootlessport, root-owned processes without sudo)"
+      "description": "Hide ports whose process info is not accessible (e.g. rootlessport, root-owned processes without sudo)",
+      "label": "Hide unknown ports"
     },
-    "glyph": {
-      "label": "Glyph",
-      "description": "Icon shown in the bar."
+    "ignore_list": {
+      "description": "Comma-separated process name substrings to hide (e.g. discord,chrome,steam)",
+      "label": "Ignore processes"
+    },
+    "ignore_ports": {
+      "description": "Comma-separated port numbers to hide (e.g. 37700,6463)",
+      "label": "Ignore ports"
+    },
+    "refresh_interval": {
+      "description": "Seconds between port scans",
+      "label": "Refresh interval"
     }
-  }
+  },
+  "title": "Portctl"
 }

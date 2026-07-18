@@ -1,12 +1,16 @@
 {
-  "settings": {
-    "prismlauncher_path": {
-      "label": "PrismLauncher path",
-      "description": "Path to PrismLauncher"
-    }
-  },
   "no_instances": {
-    "title": "No instances found",
-    "subtitle": "Filter: "
+    "subtitle": "Filter: ",
+    "title": "No instances found"
+  },
+  "settings": {
+    "launcher_exec_command": {
+      "description": "Start Prismlauncher or fork of choice",
+      "label": "Prism Executable"
+    },
+    "prismlauncher_path": {
+      "description": "Path to PrismLauncher",
+      "label": "PrismLauncher path"
+    }
   }
 }
