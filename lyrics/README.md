@@ -1,7 +1,8 @@
-# Lyrics
+# Noctalia Lyrics 1.4.0
 
-Lyrics adds a synchronized status-bar lyric display with album artwork, karaoke
-highlighting, animated line changes, and configurable online or local sources.
+Synchronized lyrics for the Noctalia bar, with multiple MPRIS players,
+translation and romanization layers, configurable sources, karaoke highlighting,
+album artwork, and layout controls.
 
 ## Plugin
 
@@ -12,80 +13,153 @@ highlighting, animated line changes, and configurable online or local sources.
 
 ## Requirements
 
-Install `playerctl`, `python3`, and `cp` on `PATH`. The active media
-player must expose MPRIS metadata for automatic track and playback detection.
+Install these commands on `PATH`:
 
-Noctalia installs the plugin files; it does not install system packages for you.
-To check or install the runtime packages automatically, run:
-
-```sh
-sh scripts/setup-deps.sh --check
-sh scripts/setup-deps.sh
-```
-
-Use `--yes` for unattended installs. The script supports `apt`, `dnf`,
-`pacman`, `zypper`, `apk`, and `xbps-install`.
+- `playerctl`: read and control MPRIS players.
+- `python3`: run the unified lyric-source adapter and dynamic lyric parser.
+- `cp`: preserve local MPRIS artwork in the plugin cache.
+- `chmod`: restrict temporary credential request files to the current user.
 
 ## Usage
 
-Enable `h465855hgg/lyrics`, then add the `lyrics` bar widget in Noctalia's bar
-settings. The background `service` detects the active MPRIS player, resolves
-lyrics, downloads or caches album artwork, and publishes playback state to the
-widget.
-
-When several players are available, the service prefers a playing player, then
-a paused player, and keeps the current player when priorities are equal. The
-optional allowlist and blocklist match player names or instances and support
-`*` wildcards.
-
-Left-click the widget to switch between lyrics and track information. Right-click
-to pause or resume the active player. Paused content is dimmed and all lyric,
-transition, and marquee animation stops until playback resumes.
-
-When synchronized lyrics are unavailable, the widget displays
-`track title + artist`. Long lines pause at each end while scrolling. Intro and
-instrumental gaps can show a configurable cue such as `•••••`.
+Enable `h465855hgg/lyrics`, start its `service` entry, and add the `lyrics` bar
+widget. Left-click switches between lyrics and track information when
+`display_mode` is `toggle`; right-click pauses or resumes the selected player.
 
 ## Screenshots
 
-Status-bar widget:
+Double-line widget with translated or romanized lyrics:
 
-![Lyrics bar widget](screenshots/widget.webp)
+![Lyrics 1.4 widget](<screenshots/widget - 1.4.0.png>)
 
-Plugin settings:
+Plugin-wide settings:
 
-![Lyrics settings](screenshots/settings.webp)
+![Lyrics 1.4 settings](<screenshots/settings - 1.4.0.png>)
+
+Per-widget bar settings:
+
+![Lyrics 1.4 bar widget settings](<screenshots/bar widget settings - 1.4.0.png>)
+
+## Local development
+
+Add the parent directory of this checkout as a local Noctalia source:
+
+```sh
+noctalia msg plugins source add lyrics-dev path /path/to/plugin-parent
+noctalia msg plugins enable h465855hgg/lyrics
+noctalia msg config-reload
+```
+
+Run validation after every change:
+
+```sh
+python3 .github/workflows/validate-plugins.py
+noctalia plugins lint lyrics
+sh lyrics/scripts/setup-deps.sh --check
+cd lyrics
+python3 -m py_compile lyric_sources.py krc_decode.py lrclib_lyric.py
+```
+
+## Lyrics model
+
+Every source is normalized to lines with independent original, translation,
+romanization, and character-timing fields:
+
+```json
+{
+  "time": 1200,
+  "duration": 1800,
+  "text": "Original lyric",
+  "translation": "Translated lyric",
+  "romanization": "romanized lyric",
+  "chars": [1200, 1500, 1800]
+}
+```
+
+## Sources
+
+`auto` tries the IDs listed in `lyrics_sources` from top to bottom. Supported
+IDs are:
+
+- `lrclib`: public LRCLIB search.
+- `netease`: public NetEase search, synchronized lyrics, translations, and
+  romanization when returned.
+- `qqmusic`: public QQ Music search and lyric endpoint.
+- `kugou`: public Kugou search and lyric download endpoint.
+- `qishui`: user-configured HTTP endpoint supporting `{title}`, `{artist}`, and
+  `{album}` placeholders.
+- `apple_music`: Apple Music catalog and lyrics request using manually supplied
+  developer and optional user tokens.
+- `spotify`: Spotify search and color-lyrics request using a manually supplied
+  access token or `sp_dc`.
+- `musixmatch`: Musixmatch subtitle request using a manually supplied usertoken.
+- `mpris`: embedded `xesam:asText` lyrics from the selected player.
+- `custom`: existing generic HTTP endpoint.
+- `external`: lyrics pushed through Noctalia IPC.
+
+Source APIs can change or reject requests by region or account. Failure of one
+source in automatic mode moves to the next source without logging credentials.
+
+## Credential warning
+
+Noctalia currently exposes these as normal string settings, not secret fields.
+Spotify, Apple Music, Musixmatch, and Qishui credentials may therefore be stored
+in plaintext in Noctalia's settings. The plugin never scans browser cookies,
+never logs credential values, and deletes its temporary credential request file
+as soon as the source adapter reads it.
 
 ## Settings
 
-| Setting | Type | Default | Description |
-| --- | --- | --- | --- |
-| `player_allowlist` | `string_list` | empty | Only uses matching MPRIS player names or instances; supports `*` wildcards. |
-| `player_blocklist` | `string_list` | empty | Ignores matching MPRIS player names or instances; takes priority over the allowlist. |
-| `lyrics_source` | `select` | `auto` | Selects automatic fallback, LRCLIB, public NetEase, MPRIS text, custom HTTP, or external IPC. |
-| `custom_url` | `string` | empty | HTTP URL template with `{title}`, `{artist}`, `{album}`, and `{duration}` placeholders. |
-| `custom_json_field` | `string` | `syncedLyrics` | Dotted field path containing an LRC string or timed-lines array in a JSON response. |
-| `cue_text` | `string` | `•••••` | Characters highlighted through long intro or instrumental gaps. |
-| `cue_font_mode` | `select` | `follow` | Follows Noctalia's interface font or uses a custom installed font for intro/interlude characters. |
-| `cue_font_family` | `string` | `sans-serif` | Installed font family used for intro/interlude characters in custom-font mode. |
-| `scroll_mode` | `select` | `auto` | Enables automatic marquee, forced marquee, or static truncation. |
-| `marquee_speed` | `int` | `30` | Approximate long-line scroll speed in logical pixels per second. |
-| `max_lines` | `int` | `1` | Number of lines shown on a vertical bar, from 1 to 3. |
-| `gradient` | `bool` | `true` | Enables progressive per-character highlighting. |
-| `animation` | `select` | `karaoke` | Chooses karaoke, cascade, wave, fade-only, or no line transition. |
-| `max_chars` | `int` | `15` | Number of visible Unicode characters before marquee scrolling starts. |
-| `char_width` | `int` | `9` | Estimated logical-pixel character width used for scroll timing and minimum layout width. |
-| `glyph` | `glyph` | `music` | Fallback icon shown when album artwork is unavailable. |
-| `show_artist` | `bool` | `true` | Includes the artist in track-information mode. |
-| `hide_when_paused` | `bool` | `false` | Hides the widget instead of dimming it while paused. |
-| `show_cover` | `bool` | `true` | Shows circular album artwork beside the lyrics. |
-| `active_color` | `color` | `on_surface` | Colors the current and already-sung lyric characters. |
-| `inactive_color` | `color` | `on_surface_variant` | Colors upcoming lyrics, paused playback, and secondary lines. |
+The plugin settings control source selection and fallback order, translation
+language, lyric timing offset in milliseconds, MPRIS polling interval in
+milliseconds, double-line translation and romanization, karaoke highlighting,
+marquee behavior, transitions, fonts, spacing, and side padding.
 
-## IPC
+Per-widget settings control the fallback glyph, artist visibility, paused-state
+visibility, album-cover shape and size, and primary, inactive, and secondary
+lyric colors. Credential and source-specific fields are shown only when their
+matching source is selected; source order, credentials, polling, marquee
+metrics, player filters, and fine layout controls are under Advanced settings.
 
-External players can set `lyrics_source` to `external` and address the singleton
-service with:
+## Feature test checklist
+
+The normal settings view contains everyday source, lyric-layer, display, font,
+and animation controls. Open Advanced settings for credentials, source order,
+polling, marquee metrics, player filters, and fine padding.
+
+1. Language: change Noctalia's global language and reload the config. Plugin
+   settings and runtime text follow the host language. Noctalia currently
+   supports English and Simplified Chinese from the originally requested locale
+   set; Japanese, Korean, and Traditional Chinese are not host language options.
+   Close and reopen Settings, then disable and enable the plugin if the runtime
+   tooltip still uses the previous language.
+2. Chinese translation: use NetEase/QQ/Musixmatch with `show_translation=true`
+   and `translation_language=zh-Hans`.
+3. Romanization: enable `show_romanization` and select a NetEase/QQ track that
+   returns romanized lyrics.
+4. Sources: select each `lyrics_source` directly, then test custom fallback order
+   through `lyrics_sources`.
+5. Delay: set `lyrics_offset_ms` to `1000` and `-1000`; positive values should
+   show the next lyric one second earlier.
+6. Polling: test `poll_interval_ms` at `100`, `500`, and `2000`.
+7. Cover: test circle, rounded, square, and custom radius; change `cover_size`.
+8. Double line: enable `double_line` and switch `secondary_line_mode`.
+   On horizontal bars keep `double_line_auto_fit` enabled and lower
+   `double_line_height_budget` if the bar clips the second line.
+9. Karaoke: toggle `karaoke_enabled`; line transitions must continue when off.
+10. Hide layers: independently disable `show_translation` and
+    `show_romanization`.
+11. Track-only: select `display_mode=track`; no lyric source request should run.
+12. Font and double-line sizing: test `font_family`, `primary_font_size`,
+    `secondary_font_size`, `line_gap`, `font_weight`, and `font_style`.
+13. Animations: test karaoke, cascade, wave, fade, typewriter, pulse, blink, and
+    none.
+14. Layout: test `padding_left`, `padding_right`, and `line_gap` on horizontal and
+    vertical bars.
+
+## External protocol
+
+Address the singleton service with:
 
 ```sh
 noctalia msg plugin h465855hgg/lyrics:service all <event> '<payload>'
@@ -93,26 +167,10 @@ noctalia msg plugin h465855hgg/lyrics:service all <event> '<payload>'
 
 Supported events:
 
-- `push-lrc`: accepts synchronized or plain LRC text.
-- `push-json`: accepts JSON with a `lines` timed array or a `lyrics` LRC string.
-- `push-state`: also accepts `track`, `position`, `playing`, and `cover` fields.
-- `clear`: clears the currently published lyrics.
+- `push-lrc`: synchronized or plain LRC text.
+- `push-json`: JSON with `lines` or `lyrics`.
+- `push-state`: also updates track, position, playing, and cover.
+- `clear`: clears current lyrics.
 
-Line timestamps and character timestamps are milliseconds. MPRIS track duration
-and playback position are microseconds:
-
-```json
-{"lines":[{"time":1200,"duration":1800,"text":"Hello","chars":[1200,1500,1800,2100,2400]}]}
-```
-
-## Notes
-
-Automatic mode requests LRCLIB first, then the public NetEase Music API. Custom
-HTTP mode contacts only the configured endpoint. The plugin never reads browser
-cookies or player credentials.
-
-The service runs `playerctl` to select, read, and control MPRIS playback, `python3` for the
-LRCLIB helper and dynamic-lyric parser, and `cp` to preserve temporary local cover
-files. Public NetEase requests use Noctalia's HTTP API. Query scratch files and
-downloaded cover images are written inside the plugin runtime directory. Remote
-code is never downloaded or executed.
+MPRIS track duration and playback position are microseconds. Lyric line,
+duration, and character timestamps are milliseconds.
