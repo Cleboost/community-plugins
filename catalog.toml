@@ -251,3 +251,14 @@ description = "Quickly open your favorite websites from the launcher."
 deprecated = false
 plugin_api = 3
 tags = ["launcher", "utility", "network", "productivity"]
+
+[[plugin]]
+id = "avivbintangaringga/nextboot-selector"
+name = "Next Boot Selector"
+version = "1.0.0"
+author = "avivbintangaringga"
+license = "MIT"
+icon = "refresh-dot"
+description = "Select boot entry for the next reboot"
+plugin_api = 3
+tags = ["utility"]
