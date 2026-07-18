@@ -181,6 +181,13 @@ description_key = "setting.update_command.description"
 default         = ""
 
 [[setting]]
+key             = "optimize_command"
+type            = "string"
+label_key       = "setting.optimize_command.label"
+description_key = "setting.optimize_command.description"
+default         = "nix-store --optimise -vv"
+
+[[setting]]
 key             = "clean_command"
 type            = "string"
 label_key       = "setting.clean_command.label"
@@ -192,6 +199,13 @@ key             = "hide_update_button"
 type            = "bool"
 label_key       = "setting.hide_update_button.label"
 description_key = "setting.hide_update_button.description"
+default         = false
+
+[[setting]]
+key             = "hide_optimize_button"
+type            = "bool"
+label_key       = "setting.hide_optimize_button.label"
+description_key = "setting.hide_optimize_button.description"
 default         = false
 
 [[setting]]
