@@ -8,6 +8,7 @@ Browse and update your AniList anime and manga lists from the Noctalia bar. Open
 | --- | --- |
 | ID | `cleboost/anilist` |
 | Entries | Bar widget: `tracker`; panel: `library`; service: `api` |
+| Launcher Prefix | — |
 
 ## Requirements
 
@@ -16,6 +17,7 @@ Browse and update your AniList anime and manga lists from the Noctalia bar. Open
 3. Copy the **Client ID** and **Client secret** into the plugin settings.
 4. `python3` must be available on `PATH` (used for the temporary localhost login helper).
 5. `xdg-open` must be available on `PATH` (used to open AniList media pages from the panel).
+6. `zenity` or `kdialog` is required only if you want to download cover images from the panel preview.
 
 Network access: the service talks to `https://graphql.anilist.co` and `https://anilist.co` during login.
 
@@ -37,7 +39,11 @@ First launch:
 Inside the panel:
 
 - Switch between **Anime** and **Manga** tabs.
-- Filter by list status (Watching, Planning, Completed, Paused, Dropped, Repeating, All).
+- Filter by list status. Anime uses **Watching**, **Planning**, and so on; manga uses **Reading** instead of Watching and **Plan to Read** instead of Planning.
+- The **Watching** / **Reading** filter sorts entries by progress (highest first). Other filters sort A–Z.
+- Use **Reload list** to refresh the active tab without logging in again.
+- Use the settings button to open **Settings → Plugins**.
+- Click a cover image to open a larger preview. From there you can download the cover or close the preview.
 - Use **−** / **+** to go back or forward one episode/chapter.
 - Use the check button to mark an entry completed.
 - Use the external-link button to open the entry on AniList.
@@ -52,6 +58,7 @@ Right-click the bar widget to open the AniList website.
 | `client_secret` | `string` | `""` | Your AniList OAuth client secret (required for login). |
 | `access_token` | `string` | `""` | Optional bearer token. If empty, the token saved after browser login is used. |
 | `glyph` | `glyph` | `device-tv` | Bar widget icon. |
+| `count_mode` | `select` | `current` | Which count to show in the bar widget: `current` (anime in progress), `completed`, `total`, `in_progress` (anime + manga), or `planning`. |
 
 ## IPC
 
@@ -66,4 +73,4 @@ noctalia msg plugin cleboost/anilist:api all login "<jwt-access-token>"
 - Login starts a temporary localhost server on port `7823` only for the duration of the OAuth flow.
 - Access tokens are stored in the plugin data directory (`token.json`) after a successful login.
 - AniList tokens last about one year; connect again when they expire.
-- Incrementing progress on a **Planning** entry moves it to **Watching**. Reaching the last episode/chapter marks it **Completed**.
+- Incrementing progress on a **Planning** / **Plan to Read** entry moves it to **Watching** / **Reading**. Reaching the last episode/chapter marks it **Completed**.
