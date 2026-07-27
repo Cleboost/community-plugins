@@ -3,7 +3,7 @@
 local opened = false
 local render
 
-local status = noctalia.state.get("wifi_hotspot_status") or {
+local status = noctalia.state.get("hotspot_status") or {
   active = false,
   busy = false,
   available = true,
@@ -13,7 +13,7 @@ local status = noctalia.state.get("wifi_hotspot_status") or {
 }
 
 local function sendCommand(action)
-  noctalia.state.set("wifi_hotspot_command", { action = action })
+  noctalia.state.set("hotspot_command", { action = action })
 end
 
 local function phaseDetails()
@@ -177,7 +177,7 @@ render = function()
   panel.render(ui.column({ flexGrow = 1, gap = 12 }, children))
 end
 
-noctalia.state.watch("wifi_hotspot_status", function(value)
+noctalia.state.watch("hotspot_status", function(value)
   if type(value) ~= "table" then return end
   status = value
   if opened then render() end
@@ -185,7 +185,7 @@ end)
 
 function onOpen(_context)
   opened = true
-  status = noctalia.state.get("wifi_hotspot_status") or status
+  status = noctalia.state.get("hotspot_status") or status
   sendCommand("refresh")
   render()
 end

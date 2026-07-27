@@ -1,9 +1,9 @@
 --!nonstrict
 
-local PANEL_ID = "cleboost/wifi-hotspot:panel"
-local COMMAND_KEY = "wifi_hotspot_command"
+local PANEL_ID = "cleboost/hotspot:panel"
+local COMMAND_KEY = "hotspot_command"
 
-local status = noctalia.state.get("wifi_hotspot_status") or {
+local status = noctalia.state.get("hotspot_status") or {
   active = false,
   busy = false,
   available = true,
@@ -43,7 +43,7 @@ local function render()
   end
 end
 
-noctalia.state.watch("wifi_hotspot_status", function(value)
+noctalia.state.watch("hotspot_status", function(value)
   if type(value) == "table" then
     status = value
     render()

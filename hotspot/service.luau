@@ -1,7 +1,7 @@
 --!nonstrict
 
-local STATUS_KEY = "wifi_hotspot_status"
-local COMMAND_KEY = "wifi_hotspot_command"
+local STATUS_KEY = "hotspot_status"
+local COMMAND_KEY = "hotspot_command"
 
 local busy = false
 local revision = 0

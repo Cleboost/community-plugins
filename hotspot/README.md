@@ -7,7 +7,7 @@ devices in a panel, and control the service over IPC.
 
 | Field | Value |
 | --- | --- |
-| ID | `cleboost/wifi-hotspot` |
+| ID | `cleboost/hotspot` |
 | Entries | Bar widget: `toggle`; panel: `panel`; service: `hotspot` |
 
 ## Requirements
@@ -24,7 +24,7 @@ Install `nmcli` from NetworkManager, plus `iw` and `ip` from iproute2, on
 4. Right-click the widget to start or stop the hotspot.
 
 ```sh
-noctalia msg panel-toggle cleboost/wifi-hotspot:panel
+noctalia msg panel-toggle cleboost/hotspot:panel
 ```
 
 Starting a hotspot may disconnect the Wi-Fi adapter from its current network
@@ -42,10 +42,10 @@ while the access point is active.
 ## IPC
 
 ```sh
-noctalia msg plugin cleboost/wifi-hotspot:hotspot all enable
-noctalia msg plugin cleboost/wifi-hotspot:hotspot all disable
-noctalia msg plugin cleboost/wifi-hotspot:hotspot all toggle
-noctalia msg plugin cleboost/wifi-hotspot:hotspot all refresh
+noctalia msg plugin cleboost/hotspot:hotspot all enable
+noctalia msg plugin cleboost/hotspot:hotspot all disable
+noctalia msg plugin cleboost/hotspot:hotspot all toggle
+noctalia msg plugin cleboost/hotspot:hotspot all refresh
 ```
 
 The `enable`, `disable`, and `toggle` events change the hotspot state.
