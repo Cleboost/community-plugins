@@ -671,7 +671,9 @@ end
 function onClose()
   coverPreview = nil
   noctalia.state.set("anilist_open", false)
-  noctalia.setUpdateInterval(LIST_IDLE_INTERVAL_MS)
+  if not snapshot.oauthLoading then
+    noctalia.setUpdateInterval(LIST_IDLE_INTERVAL_MS)
+  end
 end
 
 function update()
@@ -709,7 +711,6 @@ function onNoop() end
 
 function onConnect()
   sendCommand("start_oauth")
-  snapshot.error = ""
   dirty = true
   render()
 end
