@@ -132,6 +132,7 @@ def main() -> int:
             if error:
                 result["status"] = "error"
                 result["error"] = str(error)
+                emit({"ok": False, "error": str(error)}, result_path)
                 self._success_page("Login failed", "Return to Noctalia and try again.")
                 done.set()
                 return
@@ -140,6 +141,7 @@ def main() -> int:
             if not code:
                 result["status"] = "error"
                 result["error"] = "missing authorization code"
+                emit({"ok": False, "error": "missing authorization code"}, result_path)
                 self._success_page("Login failed", "No authorization code was received.")
                 done.set()
                 return
@@ -147,20 +149,24 @@ def main() -> int:
             try:
                 token = exchange_code(client_id, client_secret, code)
             except urllib.error.HTTPError as exc:
+                message = format_http_error(exc)
                 result["status"] = "error"
-                result["error"] = format_http_error(exc)
+                result["error"] = message
+                emit({"ok": False, "error": message}, result_path)
                 self._success_page("Login failed", "Could not finish login. Return to Noctalia and try again.")
                 done.set()
                 return
             except Exception as exc:  # noqa: BLE001
                 result["status"] = "error"
                 result["error"] = str(exc)
+                emit({"ok": False, "error": str(exc)}, result_path)
                 self._success_page("Login failed", "Could not finish login. Return to Noctalia and try again.")
                 done.set()
                 return
 
             result["status"] = "ok"
             result["access_token"] = token
+            emit({"ok": True, "access_token": token}, result_path)
             self._success_page(
                 "Connected to AniList",
                 "You can close this tab and return to Noctalia.",
