@@ -2,8 +2,9 @@
 
 ![JetBrains Provider thumbnail](thumbnail.webp)
 
-JetBrains Provider integrates recent projects from all JetBrains IDEs with the
-Noctalia launcher so you can reopen a project quickly without leaving the shell.
+JetBrains Provider integrates recent projects from supported JetBrains-based IDEs
+with the Noctalia launcher so you can reopen a project quickly without leaving
+the shell.
 
 ## Plugin
 
@@ -15,15 +16,21 @@ Noctalia launcher so you can reopen a project quickly without leaving the shell.
 
 ## Requirements
 
-Install at least one JetBrains IDE (via Toolbox or standalone). The plugin
-uses `bash` and `awk` to scan recent-project files and `nohup` to launch IDEs
-in the background.
+Install at least one supported IDE (via Toolbox or standalone). The plugin uses
+`bash` and `awk` to scan recent-project files and `nohup` to launch IDEs in the
+background.
 
 ## Usage
 
-Open the Noctalia launcher and type `/jb` to list recent projects from all
-installed JetBrains IDEs. Continue typing to filter projects by name, then
-select one to open it with the IDE that last used it.
+Open the Noctalia launcher and type `/jb` to list recent projects from your
+installed IDEs. Continue typing to filter projects by name, then select one to
+open it with the IDE that last used it.
+
+## Supported IDEs
+
+IntelliJ IDEA (Ultimate and Community `IdeaIC`), Android Studio, WebStorm,
+CLion, GoLand, RustRover, PyCharm (including Community `PyCharmCE`), PhpStorm,
+RubyMine, DataGrip, and Rider.
 
 ## Settings
 

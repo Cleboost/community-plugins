@@ -6,21 +6,24 @@ TOOLBOX="${JB_TOOLBOX_DIR:-$HOME/.local/share/JetBrains/Toolbox/apps}"
 MAX_RESULTS="${JB_MAX_RESULTS:-20}"
 IGNORED=("$@")
 
-PRODUCTS=(
-	IntelliJIdea
-	WebStorm
-	CLion
-	GoLand
-	RustRover
-	PyCharm
-	PhpStorm
-	RubyMine
-	DataGrip
-	Rider
+PRODUCT_PREFIXES=(
+	IdeaIC:IntelliJIdea
+	IntelliJIdea:IntelliJIdea
+	AndroidStudio:AndroidStudio
+	WebStorm:WebStorm
+	CLion:CLion
+	GoLand:GoLand
+	RustRover:RustRover
+	PyCharm:PyCharm
+	PhpStorm:PhpStorm
+	RubyMine:RubyMine
+	DataGrip:DataGrip
+	Rider:Rider
 )
 
 declare -A PRODUCT_CMD=(
 	[IntelliJIdea]=idea
+	[AndroidStudio]=studio
 	[WebStorm]=webstorm
 	[CLion]=clion
 	[GoLand]=goland
@@ -34,6 +37,7 @@ declare -A PRODUCT_CMD=(
 
 declare -A PRODUCT_SLUG=(
 	[IntelliJIdea]=intellij-idea
+	[AndroidStudio]=android-studio
 	[WebStorm]=webstorm
 	[CLion]=clion
 	[GoLand]=goland
@@ -47,6 +51,7 @@ declare -A PRODUCT_SLUG=(
 
 declare -A PRODUCT_ICON=(
 	[IntelliJIdea]=jetbrains-intellij-idea
+	[AndroidStudio]=com.google.AndroidStudio
 	[WebStorm]=com.jetbrains.WebStorm
 	[CLion]=com.jetbrains.CLion
 	[GoLand]=com.jetbrains.GoLand
@@ -61,10 +66,12 @@ declare -A PRODUCT_ICON=(
 declare -A seen_icons=()
 
 product_name() {
-	local dir="$1" product
-	for product in "${PRODUCTS[@]}"; do
-		if [[ "$dir" == "$product"* ]]; then
-			printf '%s\n' "$product"
+	local dir="$1" entry prefix canonical
+	for entry in "${PRODUCT_PREFIXES[@]}"; do
+		prefix="${entry%%:*}"
+		canonical="${entry#*:}"
+		if [[ "$dir" == "$prefix"* ]]; then
+			printf '%s\n' "$canonical"
 			return 0
 		fi
 	done
@@ -124,6 +131,15 @@ parse_xml() {
 	local xml="$1"
 	local product="$2"
 	awk -v product="$product" -v home="$HOME" '
+		function decode_xml(text) {
+			gsub("&quot;", "\"", text)
+			gsub("&apos;", "\047", text)
+			gsub("&lt;", "<", text)
+			gsub("&gt;", ">", text)
+			gsub("&amp;", "\\&", text)
+			return text
+		}
+
 		function expand_path(path,    pos, needle) {
 			needle = "$USER_HOME$"
 			while ((pos = index(path, needle)) > 0) {
@@ -140,7 +156,7 @@ parse_xml() {
 		/<entry key="/ {
 			key = ""
 			if (match($0, /key="[^"]+"/)) {
-				key = expand_path(substr($0, RSTART + 5, RLENGTH - 6))
+				key = decode_xml(expand_path(substr($0, RSTART + 5, RLENGTH - 6)))
 			}
 			if (key == "" || key ~ /^\$/) next
 

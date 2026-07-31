@@ -5,6 +5,7 @@ local productIcons = {}
 
 local PRODUCTS = {
 	IntelliJIdea = { cmd = "idea", slug = "intellij-idea" },
+	AndroidStudio = { cmd = "studio", slug = "android-studio" },
 	WebStorm = { cmd = "webstorm", slug = "webstorm" },
 	CLion = { cmd = "clion", slug = "clion" },
 	GoLand = { cmd = "goland", slug = "goland" },
@@ -72,7 +73,7 @@ local function buildScanCommand()
 	end
 
 	return string.format(
-		"JB_CONFIG_DIR=%s JB_TOOLBOX_DIR=%s JB_MAX_RESULTS=%d bash %s%s",
+		"JB_CONFIG_DIR=%s JB_TOOLBOX_DIR=%s JB_MAX_RESULTS=%d bash %s%s 2>/dev/null",
 		shellQuote(getConfigDir()),
 		shellQuote(getToolboxDir()),
 		getMaxResults(),
@@ -101,40 +102,15 @@ local function parseScanOutput(stdout)
 	return projects
 end
 
-local function loadProjects(onDone)
-	noctalia.runAsync(buildScanCommand(), function(result)
-		local projects = {}
-		if result.exitCode == 0 and type(result.stdout) == "string" then
-			projects = parseScanOutput(result.stdout)
-		end
-		cachedProjects = #projects > 0 and projects or nil
-		onDone(projects)
-	end)
-end
-
-local function resolveLauncher(product)
-	local meta = PRODUCTS[product]
-	if meta == nil then
-		return nil
-	end
-
-	local script = getToolboxDir() .. "/" .. meta.slug .. "/bin/" .. meta.cmd .. ".sh"
-	if noctalia.fileExists(script) then
-		return script
-	end
-
-	return meta.cmd
-end
-
 local function makeRows(projects, filter)
 	local home = noctalia.getenv("HOME") or ""
 	local rows = {}
 	for _, project in ipairs(projects) do
 		local path = project.path
 		local name = projectName(path)
-		local score
-		if filter ~= "" then
-			score = noctalia.fuzzyScore(filter, name) or noctalia.fuzzyScore(filter, path)
+		local score = filter == "" and 0 or noctalia.fuzzyScore(filter, name)
+		if score == nil then
+			score = noctalia.fuzzyScore(filter, path)
 		end
 		if filter == "" or score ~= nil then
 			local display = (home ~= "" and path:sub(1, #home) == home) and "~" .. path:sub(#home + 1) or path
@@ -143,7 +119,7 @@ local function makeRows(projects, filter)
 				id = project.product .. "|" .. path,
 				title = name,
 				subtitle = project.product .. " · " .. display,
-				score = score,
+				score = filter == "" and nil or score,
 			}
 			if iconPath then
 				row.icon = iconPath
@@ -172,14 +148,40 @@ local function showResults(query, projects, filter)
 	end
 end
 
+local function loadProjects(onDone)
+	noctalia.runAsync(buildScanCommand(), function(result)
+		local projects = {}
+		if result.exitCode == 0 and type(result.stdout) == "string" then
+			projects = parseScanOutput(result.stdout)
+		end
+		cachedProjects = projects
+		onDone(projects)
+	end)
+end
+
+local function resolveLauncher(product)
+	local meta = PRODUCTS[product]
+	if meta == nil then
+		return nil
+	end
+
+	local script = getToolboxDir() .. "/" .. meta.slug .. "/bin/" .. meta.cmd .. ".sh"
+	if noctalia.fileExists(script) then
+		return script
+	end
+
+	return meta.cmd
+end
+
 function onQuery(query)
 	local filter = trim(query or "")
 
 	if filter == "" then
 		cachedProjects = nil
+		productIcons = {}
 	end
 
-	if cachedProjects ~= nil then
+	if cachedProjects then
 		showResults(query, cachedProjects, filter)
 		return
 	end
